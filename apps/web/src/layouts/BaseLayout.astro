@@ -1,0 +1,342 @@
+---
+import type { SiteSettings } from '@lib/types'
+
+type Props = {
+  title?: string
+  description?: string
+  settings?: SiteSettings | null
+}
+
+const {
+  title,
+  description = 'Photography, field notes, gear notes, and travel stories by R. Allan White.',
+  settings,
+} = Astro.props
+
+const siteName = settings?.siteName || 'R. Allan White'
+const pageTitle = title ? `${title} | ${siteName}` : `${siteName} Photography`
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content={description} />
+    <title>{pageTitle}</title>
+  </head>
+  <body>
+    <header class="site-header">
+      <a class="brand" href="/" aria-label="Home">
+        <span class="brand-mark">RAW</span>
+        <span>
+          <strong>{siteName}</strong>
+          <small>{settings?.tagline || 'Photography and field notes'}</small>
+        </span>
+      </a>
+      <nav aria-label="Main navigation">
+        <a href="/posts">Stories</a>
+        <a href="/gear">Gear</a>
+        <a href="/search">Search</a>
+      </nav>
+    </header>
+    <main>
+      <slot />
+    </main>
+    <footer class="site-footer">
+      <p>{siteName}</p>
+      <div>
+        {settings?.socialLinks?.instagram && <a href={settings.socialLinks.instagram}>Instagram</a>}
+        {settings?.socialLinks?.mastodon && <a href={settings.socialLinks.mastodon}>Mastodon</a>}
+      </div>
+    </footer>
+  </body>
+</html>
+
+<style is:global>
+  :root {
+    color-scheme: dark;
+    --bg: #101211;
+    --bg-soft: #171a18;
+    --ink: #f5f2ea;
+    --muted: #b8b3a6;
+    --line: #353832;
+    --accent: #d2a85d;
+    --accent-2: #77966d;
+    --danger: #d97b5d;
+    --max: 1180px;
+    font-family:
+      Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    background: var(--bg);
+    color: var(--ink);
+  }
+
+  * {
+    box-sizing: border-box;
+  }
+
+  html {
+    background: var(--bg);
+  }
+
+  body {
+    min-width: 320px;
+    margin: 0;
+    background:
+      linear-gradient(180deg, rgba(119, 150, 109, 0.08), transparent 28rem),
+      var(--bg);
+    color: var(--ink);
+  }
+
+  body,
+  button,
+  input,
+  select,
+  textarea {
+    font: inherit;
+  }
+
+  a {
+    color: inherit;
+    text-decoration-color: color-mix(in srgb, var(--accent) 70%, transparent);
+    text-underline-offset: 0.22em;
+  }
+
+  img,
+  video {
+    display: block;
+    max-width: 100%;
+  }
+
+  main {
+    min-height: 72vh;
+  }
+
+  .site-header,
+  .site-footer {
+    width: min(100% - 2rem, var(--max));
+    margin: 0 auto;
+  }
+
+  .site-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 1.25rem 0;
+  }
+
+  .brand {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.75rem;
+    text-decoration: none;
+  }
+
+  .brand-mark {
+    display: grid;
+    width: 2.5rem;
+    height: 2.5rem;
+    place-items: center;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    color: var(--accent);
+    font-size: 0.78rem;
+    font-weight: 800;
+  }
+
+  .brand strong,
+  .brand small {
+    display: block;
+  }
+
+  .brand small {
+    margin-top: 0.12rem;
+    color: var(--muted);
+    font-size: 0.78rem;
+  }
+
+  nav {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: 0.5rem 1rem;
+    color: var(--muted);
+    font-size: 0.92rem;
+  }
+
+  nav a {
+    text-decoration: none;
+  }
+
+  nav a:hover {
+    color: var(--ink);
+  }
+
+  .site-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 3rem 0;
+    color: var(--muted);
+    font-size: 0.9rem;
+  }
+
+  .site-footer p {
+    margin: 0;
+  }
+
+  .site-footer div {
+    display: flex;
+    gap: 1rem;
+  }
+
+  .section {
+    width: min(100% - 2rem, var(--max));
+    margin: 0 auto;
+    padding: 3rem 0;
+  }
+
+  .section-narrow {
+    width: min(100% - 2rem, 760px);
+    margin: 0 auto;
+    padding: 3rem 0;
+  }
+
+  .eyebrow {
+    margin: 0 0 0.8rem;
+    color: var(--accent);
+    font-size: 0.78rem;
+    font-weight: 700;
+    text-transform: uppercase;
+  }
+
+  h1,
+  h2,
+  h3,
+  p {
+    margin-top: 0;
+  }
+
+  h1 {
+    max-width: 11ch;
+    margin-bottom: 1rem;
+    font-size: clamp(3rem, 8vw, 7.8rem);
+    line-height: 0.93;
+    letter-spacing: 0;
+  }
+
+  h2 {
+    margin-bottom: 1rem;
+    font-size: clamp(1.65rem, 3vw, 3rem);
+    line-height: 1.02;
+    letter-spacing: 0;
+  }
+
+  h3 {
+    font-size: 1.15rem;
+    line-height: 1.2;
+  }
+
+  p {
+    color: var(--muted);
+    line-height: 1.65;
+  }
+
+  .lede {
+    max-width: 58ch;
+    color: var(--ink);
+    font-size: clamp(1.08rem, 1.8vw, 1.45rem);
+    line-height: 1.45;
+  }
+
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 0.75rem;
+  }
+
+  .button,
+  button {
+    display: inline-flex;
+    min-height: 2.65rem;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 0.65rem 1rem;
+    background: var(--ink);
+    color: var(--bg);
+    font-weight: 700;
+    text-decoration: none;
+    cursor: pointer;
+  }
+
+  .button.secondary {
+    background: transparent;
+    color: var(--ink);
+  }
+
+  .empty {
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 1.25rem;
+    background: color-mix(in srgb, var(--bg-soft) 85%, transparent);
+  }
+
+  .empty p:last-child {
+    margin-bottom: 0;
+  }
+
+  .rich-text {
+    color: var(--ink);
+  }
+
+  .rich-text p,
+  .rich-text li {
+    color: var(--muted);
+    line-height: 1.75;
+  }
+
+  .rich-text a {
+    color: var(--ink);
+  }
+
+  .tag-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.45rem;
+    padding: 0;
+    margin: 0;
+    list-style: none;
+  }
+
+  .tag-list a,
+  .tag-pill {
+    display: inline-flex;
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    padding: 0.35rem 0.65rem;
+    color: var(--muted);
+    font-size: 0.78rem;
+    text-decoration: none;
+  }
+
+  @media (max-width: 720px) {
+    .site-header,
+    .site-footer {
+      align-items: flex-start;
+      flex-direction: column;
+    }
+
+    nav {
+      justify-content: flex-start;
+    }
+
+    .section,
+    .section-narrow {
+      padding: 2.25rem 0;
+    }
+  }
+</style>

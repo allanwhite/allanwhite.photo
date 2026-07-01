@@ -1,0 +1,32 @@
+packages:
+  - apps/*
+allowBuilds:
+  esbuild: true
+  sharp: true
+  workerd: true
+minimumReleaseAgeExclude:
+  - '@astrojs/cloudflare@14.0.2'
+  - '@astrojs/compiler-binding-darwin-arm64@0.3.0'
+  - '@astrojs/compiler-binding-darwin-x64@0.3.0'
+  - '@astrojs/compiler-binding-linux-arm64-gnu@0.3.0'
+  - '@astrojs/compiler-binding-linux-arm64-musl@0.3.0'
+  - '@astrojs/compiler-binding-linux-x64-gnu@0.3.0'
+  - '@astrojs/compiler-binding-linux-x64-musl@0.3.0'
+  - '@astrojs/compiler-binding-wasm32-wasi@0.3.0'
+  - '@astrojs/compiler-binding-win32-arm64-msvc@0.3.0'
+  - '@astrojs/compiler-binding-win32-x64-msvc@0.3.0'
+  - '@astrojs/compiler-binding@0.3.0'
+  - '@astrojs/compiler-rs@0.3.0'
+  - '@sanity/cli-build@2.0.0'
+  - '@sanity/cli-core@2.1.2'
+  - '@sanity/cli@7.4.2'
+  - '@sanity/diff@6.3.0'
+  - '@sanity/mutator@6.3.0'
+  - '@sanity/schema@6.3.0'
+  - '@sanity/types@6.3.0'
+  - '@sanity/util@6.3.0'
+  - '@sanity/workbench-cli@1.1.2'
+  - astro@7.0.4
+  - miniflare@4.20260630.0
+  - sanity@6.3.0
+  - wrangler@4.106.0

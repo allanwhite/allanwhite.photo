@@ -1,0 +1,64 @@
+---
+import type { Photo } from '@lib/types'
+
+type Props = {
+  photo: Photo
+}
+
+const { photo } = Astro.props
+const exif = photo.exif
+const rows = [
+  ['Camera', exif?.camera],
+  ['Lens', exif?.lens],
+  ['Focal length', exif?.focalLength ? `${exif.focalLength}mm` : undefined],
+  ['Aperture', exif?.aperture],
+  ['Shutter', exif?.shutterSpeed],
+  ['ISO', exif?.iso ? String(exif.iso) : undefined],
+].filter((row): row is [string, string] => Boolean(row[1]))
+---
+
+{
+  rows.length > 0 && (
+    <aside class="exif">
+      <h2>Frame Data</h2>
+      <dl>
+        {rows.map(([label, value]) => (
+          <>
+            <dt>{label}</dt>
+            <dd>{value}</dd>
+          </>
+        ))}
+      </dl>
+    </aside>
+  )
+}
+
+<style>
+  .exif {
+    border-top: 1px solid var(--line);
+    padding-top: 1rem;
+  }
+
+  h2 {
+    margin-bottom: 1rem;
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    color: var(--accent);
+  }
+
+  dl {
+    display: grid;
+    grid-template-columns: minmax(6rem, 0.8fr) 1fr;
+    gap: 0.55rem 1rem;
+    margin: 0;
+  }
+
+  dt {
+    color: var(--muted);
+  }
+
+  dd {
+    margin: 0;
+    color: var(--ink);
+  }
+</style>

@@ -1,0 +1,42 @@
+---
+import { cloudinaryVideoUrl } from '@lib/cloudinary'
+
+type Props = {
+  video?: {
+    public_id?: string
+  }
+  poster?: string
+}
+
+const { video, poster } = Astro.props
+const publicId = video?.public_id || ''
+const mp4Url = cloudinaryVideoUrl(publicId, 'mp4')
+const hlsUrl = cloudinaryVideoUrl(publicId, 'm3u8')
+---
+
+{
+  mp4Url && (
+    <video class="video-player" poster={poster} muted loop playsinline preload="none" controls>
+      <source src={hlsUrl} type="application/x-mpegURL" />
+      <source src={mp4Url} type="video/mp4" />
+    </video>
+  )
+}
+
+<script>
+  document.querySelectorAll<HTMLVideoElement>('.video-player').forEach((video) => {
+    video.addEventListener('mouseenter', () => void video.play())
+    video.addEventListener('mouseleave', () => {
+      video.pause()
+      video.currentTime = 0
+    })
+  })
+</script>
+
+<style>
+  .video-player {
+    width: 100%;
+    border-radius: 8px;
+    background: #000;
+  }
+</style>

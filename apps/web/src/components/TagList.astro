@@ -1,0 +1,23 @@
+---
+import type { Tag } from '@lib/types'
+
+type Props = {
+  tags?: Tag[]
+}
+
+const { tags = [] } = Astro.props
+---
+
+{
+  tags.length > 0 && (
+    <ul class="tag-list">
+      {tags.map((tag) => (
+        tag.slug?.current && (
+          <li>
+            <a href={`/tags/${tag.slug.current}`}>{tag.name || tag.slug.current}</a>
+          </li>
+        )
+      ))}
+    </ul>
+  )
+}

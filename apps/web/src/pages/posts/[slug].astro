@@ -1,0 +1,60 @@
+---
+import GalleryGrid from '@components/GalleryGrid.astro'
+import TagList from '@components/TagList.astro'
+import BaseLayout from '@layouts/BaseLayout.astro'
+import { formatDate } from '@lib/format'
+import { renderPortableText } from '@lib/portableText'
+import { allPostSlugsQuery, postBySlugQuery, siteSettingsQuery } from '@lib/queries'
+import { fetchSanity, hasSanityConfig } from '@lib/sanity'
+import type { Photo, Post, SiteSettings } from '@lib/types'
+
+export async function getStaticPaths() {
+  if (!hasSanityConfig) return []
+
+  const slugs = await fetchSanity<{ slug: string }[]>(allPostSlugsQuery, {}, [])
+  return slugs.map(({ slug }) => ({ params: { slug } }))
+}
+
+const { slug } = Astro.params
+const [settings, post] = await Promise.all([
+  fetchSanity<SiteSettings | null>(siteSettingsQuery, {}, null),
+  fetchSanity<Post | null>(postBySlugQuery, { slug }, null),
+])
+
+if (!post) return Astro.redirect('/404')
+
+const bodyHtml = renderPortableText(post.body)
+const galleryPhotos: Photo[] =
+  post.featuredGallery?.photos?.map((item) => item.photo).filter(Boolean) as Photo[] || []
+---
+
+<BaseLayout title={post.title} description={post.excerpt} settings={settings}>
+  <article>
+    <header class="section-narrow post-head">
+      <p class="eyebrow">{post.publishedAt ? formatDate(post.publishedAt) : 'Story'}</p>
+      <h1>{post.title || 'Untitled story'}</h1>
+      {post.excerpt && <p class="lede">{post.excerpt}</p>}
+      <TagList tags={post.tags} />
+    </header>
+    {
+      galleryPhotos.length > 0 && (
+        <section class="section post-gallery">
+          <GalleryGrid photos={galleryPhotos} />
+        </section>
+      )
+    }
+    <section class="section-narrow">
+      {bodyHtml ? <div class="rich-text" set:html={bodyHtml} /> : <div class="empty"><p>No body content yet.</p></div>}
+    </section>
+  </article>
+</BaseLayout>
+
+<style>
+  .post-head h1 {
+    max-width: 10ch;
+  }
+
+  .post-gallery {
+    padding-top: 0;
+  }
+</style>

@@ -1,0 +1,140 @@
+---
+import PhotoCard from '@components/PhotoCard.astro'
+import BaseLayout from '@layouts/BaseLayout.astro'
+import { formatDate, hrefForType } from '@lib/format'
+import { buildSearchQuery, siteSettingsQuery } from '@lib/queries'
+import { fetchSanity } from '@lib/sanity'
+import type { SearchResult, SiteSettings } from '@lib/types'
+
+export const prerender = false
+
+const params = Astro.url.searchParams
+const q = params.get('q')?.trim() || ''
+const tags = params.getAll('tag').filter(Boolean)
+const type = params.get('type') || undefined
+const gear = params.get('gear') || undefined
+const from = params.get('from') || undefined
+const to = params.get('to') || undefined
+const sort = params.get('sort') || undefined
+const page = Math.max(Number(params.get('page') || '1'), 1)
+const offset = (page - 1) * 24
+const query = buildSearchQuery({ q, tags, type, gear, from, to, sort, offset })
+
+const [settings, results] = await Promise.all([
+  fetchSanity<SiteSettings | null>(siteSettingsQuery, {}, null),
+  fetchSanity<SearchResult[]>(query, {}, []),
+])
+---
+
+<BaseLayout title="Search" settings={settings}>
+  <section class="section">
+    <p class="eyebrow">Search</p>
+    <h1>Browse</h1>
+    <form class="search-form" method="get">
+      <label>
+        <span>Search</span>
+        <input name="q" value={q} placeholder="storr, long exposure, om-3" />
+      </label>
+      <label>
+        <span>Type</span>
+        <select name="type">
+          <option value="" selected={!type}>All</option>
+          <option value="photo" selected={type === 'photo'}>Photos</option>
+          <option value="post" selected={type === 'post'}>Stories</option>
+          <option value="gallery" selected={type === 'gallery'}>Galleries</option>
+          <option value="gear" selected={type === 'gear'}>Gear</option>
+        </select>
+      </label>
+      <button type="submit">Search</button>
+    </form>
+
+    {
+      results.length ? (
+        <div class="results">
+          {results.map((item) => (
+            item._type === 'photo' ? (
+              <PhotoCard photo={item} />
+            ) : (
+              <article>
+                <a href={hrefForType(item._type, item.slug?.current)}>
+                  <span>{item._type}{item.takenAt ? `, ${formatDate(item.takenAt)}` : ''}</span>
+                  <h2>{item.title || 'Untitled'}</h2>
+                  {item.excerpt && <p>{item.excerpt}</p>}
+                </a>
+              </article>
+            )
+          ))}
+        </div>
+      ) : (
+        <div class="empty">
+          <p>No results found.</p>
+        </div>
+      )
+    }
+  </section>
+</BaseLayout>
+
+<style>
+  .search-form {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(10rem, 14rem) auto;
+    gap: 0.75rem;
+    align-items: end;
+    margin: 1.5rem 0 2rem;
+  }
+
+  label {
+    display: grid;
+    gap: 0.35rem;
+  }
+
+  label span {
+    color: var(--muted);
+    font-size: 0.85rem;
+  }
+
+  input,
+  select {
+    width: 100%;
+    min-height: 2.65rem;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 0.55rem 0.7rem;
+    background: var(--bg-soft);
+    color: var(--ink);
+  }
+
+  .results {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 0.9rem;
+  }
+
+  article {
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 1rem;
+    background: var(--bg-soft);
+  }
+
+  article a {
+    text-decoration: none;
+  }
+
+  article span {
+    color: var(--accent);
+    font-size: 0.8rem;
+    text-transform: capitalize;
+  }
+
+  article h2 {
+    margin: 0.45rem 0;
+    font-size: 1.3rem;
+  }
+
+  @media (max-width: 720px) {
+    .search-form {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

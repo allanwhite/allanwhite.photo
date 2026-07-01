@@ -1,0 +1,179 @@
+---
+import PhotoCard from '@components/PhotoCard.astro'
+import TagList from '@components/TagList.astro'
+import BaseLayout from '@layouts/BaseLayout.astro'
+import { formatDate } from '@lib/format'
+import { fetchSanity } from '@lib/sanity'
+import { hasImage, sanityImageUrl } from '@lib/sanityImage'
+import { latestPhotosQuery, latestPostsQuery, siteSettingsQuery } from '@lib/queries'
+import type { Photo, Post, SiteSettings } from '@lib/types'
+
+const [settings, photos, posts] = await Promise.all([
+  fetchSanity<SiteSettings | null>(siteSettingsQuery, {}, null),
+  fetchSanity<Photo[]>(latestPhotosQuery, {}, []),
+  fetchSanity<Post[]>(latestPostsQuery, {}, []),
+])
+
+const heroPhoto = photos[0] || settings?.defaultSeoImage
+const heroSrc = hasImage(heroPhoto?.image)
+  ? sanityImageUrl(heroPhoto.image).width(1800).height(1200).fit('crop').auto('format').url()
+  : ''
+---
+
+<BaseLayout settings={settings}>
+  <section class="home-hero">
+    {heroSrc && <img src={heroSrc} alt={heroPhoto?.image?.alt || heroPhoto?.title || ''} decoding="async" />}
+    <div class="home-hero-content">
+      <p class="eyebrow">Photography</p>
+      <h1>{settings?.siteName || 'R. Allan White'}</h1>
+      <p class="lede">{settings?.tagline || 'Field notes, gear notes, and image-led stories from the road.'}</p>
+      <div class="actions">
+        <a class="button" href="/search">Browse work</a>
+        <a class="button secondary" href="/posts">Read stories</a>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="section-heading">
+      <div>
+        <p class="eyebrow">Recent Photos</p>
+        <h2>Latest frames</h2>
+      </div>
+    </div>
+    {
+      photos.length ? (
+        <div class="grid photo-grid">
+          {photos.map((photo, index) => <PhotoCard photo={photo} priority={index < 2} />)}
+        </div>
+      ) : (
+        <div class="empty">
+          <p>No photos published yet.</p>
+        </div>
+      )
+    }
+  </section>
+
+  <section class="section stories-band">
+    <p class="eyebrow">Stories</p>
+    <h2>Recent field notes</h2>
+    {
+      posts.length ? (
+        <div class="story-list">
+          {posts.map((post) => (
+            <article>
+              <a href={post.slug?.current ? `/posts/${post.slug.current}` : '#'}>
+                <span>{post.publishedAt ? formatDate(post.publishedAt) : 'Draft date'}</span>
+                <h3>{post.title || 'Untitled story'}</h3>
+                {post.excerpt && <p>{post.excerpt}</p>}
+                <TagList tags={post.tags} />
+              </a>
+            </article>
+          ))}
+        </div>
+      ) : (
+        <div class="empty">
+          <p>No stories published yet.</p>
+        </div>
+      )
+    }
+  </section>
+</BaseLayout>
+
+<style>
+  .home-hero {
+    position: relative;
+    min-height: min(82vh, 780px);
+    display: grid;
+    align-items: end;
+    overflow: hidden;
+    background:
+      linear-gradient(140deg, rgba(210, 168, 93, 0.18), transparent 36%),
+      linear-gradient(20deg, rgba(119, 150, 109, 0.18), transparent 42%),
+      #151815;
+  }
+
+  .home-hero img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    opacity: 0.86;
+  }
+
+  .home-hero::after {
+    position: absolute;
+    inset: 0;
+    content: '';
+    background: linear-gradient(90deg, rgba(16, 18, 17, 0.88), rgba(16, 18, 17, 0.2));
+  }
+
+  .home-hero-content {
+    position: relative;
+    z-index: 1;
+    width: min(100% - 2rem, var(--max));
+    margin: 0 auto;
+    padding: 7rem 0 5rem;
+  }
+
+  .actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    margin-top: 2rem;
+  }
+
+  .section-heading {
+    display: flex;
+    align-items: end;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-bottom: 1rem;
+  }
+
+  .photo-grid {
+    grid-auto-rows: minmax(18rem, auto);
+  }
+
+  .stories-band {
+    border-top: 1px solid var(--line);
+  }
+
+  .story-list {
+    display: grid;
+    gap: 0.75rem;
+  }
+
+  .story-list article {
+    border-top: 1px solid var(--line);
+  }
+
+  .story-list a {
+    display: grid;
+    grid-template-columns: 10rem minmax(0, 1fr);
+    gap: 1rem;
+    padding: 1.25rem 0;
+    text-decoration: none;
+  }
+
+  .story-list span {
+    color: var(--accent);
+    font-size: 0.86rem;
+  }
+
+  .story-list h3 {
+    margin-bottom: 0.35rem;
+  }
+
+  .story-list p {
+    max-width: 65ch;
+    margin-bottom: 0.75rem;
+  }
+
+  @media (max-width: 720px) {
+    .story-list a {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

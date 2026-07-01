@@ -1,0 +1,17 @@
+---
+import BaseLayout from '@layouts/BaseLayout.astro'
+import { siteSettingsQuery } from '@lib/queries'
+import { fetchSanity } from '@lib/sanity'
+import type { SiteSettings } from '@lib/types'
+
+const settings = await fetchSanity<SiteSettings | null>(siteSettingsQuery, {}, null)
+---
+
+<BaseLayout title="Not found" settings={settings}>
+  <section class="section-narrow">
+    <p class="eyebrow">404</p>
+    <h1>Not found</h1>
+    <p class="lede">That page is not published here.</p>
+    <a class="button" href="/">Go home</a>
+  </section>
+</BaseLayout>

@@ -1,0 +1,67 @@
+---
+import TagList from '@components/TagList.astro'
+import BaseLayout from '@layouts/BaseLayout.astro'
+import { formatDate } from '@lib/format'
+import { latestPostsQuery, siteSettingsQuery } from '@lib/queries'
+import { fetchSanity } from '@lib/sanity'
+import type { Post, SiteSettings } from '@lib/types'
+
+const [settings, posts] = await Promise.all([
+  fetchSanity<SiteSettings | null>(siteSettingsQuery, {}, null),
+  fetchSanity<Post[]>(latestPostsQuery, {}, []),
+])
+---
+
+<BaseLayout title="Stories" settings={settings}>
+  <section class="section-narrow">
+    <p class="eyebrow">Stories</p>
+    <h1>Field notes</h1>
+    {
+      posts.length ? (
+        <div class="post-index">
+          {posts.map((post) => (
+            <article>
+              <a href={post.slug?.current ? `/posts/${post.slug.current}` : '#'}>
+                <span>{post.publishedAt ? formatDate(post.publishedAt) : 'No date'}</span>
+                <h2>{post.title || 'Untitled story'}</h2>
+                {post.excerpt && <p>{post.excerpt}</p>}
+                <TagList tags={post.tags} />
+              </a>
+            </article>
+          ))}
+        </div>
+      ) : (
+        <div class="empty">
+          <p>No stories published yet.</p>
+        </div>
+      )
+    }
+  </section>
+</BaseLayout>
+
+<style>
+  .post-index {
+    display: grid;
+    gap: 1rem;
+  }
+
+  article {
+    border-top: 1px solid var(--line);
+  }
+
+  a {
+    display: block;
+    padding: 1.25rem 0;
+    text-decoration: none;
+  }
+
+  span {
+    color: var(--accent);
+    font-size: 0.86rem;
+  }
+
+  h2 {
+    margin: 0.35rem 0;
+    font-size: clamp(1.5rem, 3vw, 2.4rem);
+  }
+</style>

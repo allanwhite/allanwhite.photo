@@ -1,0 +1,40 @@
+---
+type Props = {
+  lat?: number
+  lng?: number
+  placeName?: string
+}
+
+const { lat, lng, placeName } = Astro.props
+const hasCoords = typeof lat === 'number' && typeof lng === 'number'
+---
+
+{
+  hasCoords && (
+    <a class="map-embed" href={`https://www.google.com/maps?q=${lat},${lng}`} target="_blank" rel="noopener">
+      <span>{placeName || 'View location'}</span>
+      <small>{lat.toFixed(4)}, {lng.toFixed(4)}</small>
+    </a>
+  )
+}
+
+<style>
+  .map-embed {
+    display: grid;
+    gap: 0.2rem;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 1rem;
+    background: var(--bg-soft);
+    text-decoration: none;
+  }
+
+  span {
+    color: var(--ink);
+    font-weight: 700;
+  }
+
+  small {
+    color: var(--muted);
+  }
+</style>

@@ -1,0 +1,38 @@
+---
+import PhotoCard from '@components/PhotoCard.astro'
+import BaseLayout from '@layouts/BaseLayout.astro'
+import { photosByTagQuery, siteSettingsQuery, tagBySlugQuery } from '@lib/queries'
+import { fetchSanity } from '@lib/sanity'
+import type { Photo, SiteSettings, Tag } from '@lib/types'
+
+export const prerender = false
+
+const { slug } = Astro.params
+const page = Math.max(Number(Astro.url.searchParams.get('page') || '1'), 1)
+const offset = (page - 1) * 24
+
+const [settings, tag, photos] = await Promise.all([
+  fetchSanity<SiteSettings | null>(siteSettingsQuery, {}, null),
+  fetchSanity<Tag | null>(tagBySlugQuery, { slug }, null),
+  fetchSanity<Photo[]>(photosByTagQuery, { tagSlug: slug, offset, limit: 24 }, []),
+])
+---
+
+<BaseLayout title={tag?.name || slug} settings={settings}>
+  <section class="section">
+    <p class="eyebrow">Tag</p>
+    <h1>{tag?.name || slug}</h1>
+    {tag?.description && <p class="lede">{tag.description}</p>}
+    {
+      photos.length ? (
+        <div class="grid">
+          {photos.map((photo) => <PhotoCard photo={photo} />)}
+        </div>
+      ) : (
+        <div class="empty">
+          <p>No photos found for this tag.</p>
+        </div>
+      )
+    }
+  </section>
+</BaseLayout>

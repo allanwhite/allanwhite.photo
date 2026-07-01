@@ -1,0 +1,62 @@
+---
+import GalleryGrid from '@components/GalleryGrid.astro'
+import MapEmbed from '@components/MapEmbed.astro'
+import TagList from '@components/TagList.astro'
+import BaseLayout from '@layouts/BaseLayout.astro'
+import { renderPortableText } from '@lib/portableText'
+import { allGallerySlugsQuery, galleryBySlugQuery, siteSettingsQuery } from '@lib/queries'
+import { fetchSanity, hasSanityConfig } from '@lib/sanity'
+import type { Gallery, Photo, SiteSettings } from '@lib/types'
+
+export async function getStaticPaths() {
+  if (!hasSanityConfig) return []
+
+  const slugs = await fetchSanity<{ slug: string }[]>(allGallerySlugsQuery, {}, [])
+  return slugs.map(({ slug }) => ({ params: { slug } }))
+}
+
+const { slug } = Astro.params
+const [settings, gallery] = await Promise.all([
+  fetchSanity<SiteSettings | null>(siteSettingsQuery, {}, null),
+  fetchSanity<Gallery | null>(galleryBySlugQuery, { slug }, null),
+])
+
+if (!gallery) return Astro.redirect('/404')
+
+const photos: Photo[] = (gallery.photos || []).map((item) => item.photo).filter(Boolean) as Photo[]
+const descriptionHtml = renderPortableText(gallery.description)
+---
+
+<BaseLayout title={gallery.title} settings={settings}>
+  <section class="section gallery-head">
+    <div>
+      <p class="eyebrow">Gallery</p>
+      <h1>{gallery.title || 'Untitled gallery'}</h1>
+      {descriptionHtml && <div class="rich-text" set:html={descriptionHtml} />}
+      <TagList tags={gallery.tags} />
+    </div>
+    <MapEmbed lat={gallery.location?.lat} lng={gallery.location?.lng} placeName={gallery.location?.placeName} />
+  </section>
+  <section class="section gallery-body">
+    <GalleryGrid photos={photos} />
+  </section>
+</BaseLayout>
+
+<style>
+  .gallery-head {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(16rem, 0.35fr);
+    gap: 2rem;
+    align-items: end;
+  }
+
+  .gallery-body {
+    padding-top: 0;
+  }
+
+  @media (max-width: 760px) {
+    .gallery-head {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

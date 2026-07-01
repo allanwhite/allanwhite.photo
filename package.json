@@ -1,0 +1,17 @@
+{
+  "name": "allanwhite-photo",
+  "private": true,
+  "type": "module",
+  "packageManager": "pnpm@11.5.2",
+  "engines": {
+    "node": ">=22.12.0"
+  },
+  "scripts": {
+    "dev:web": "pnpm --filter @allanwhite/photo-web dev",
+    "dev:studio": "pnpm --filter @allanwhite/photo-studio dev",
+    "build": "pnpm -r build",
+    "build:web": "pnpm --filter @allanwhite/photo-web build",
+    "build:studio": "pnpm --filter @allanwhite/photo-studio build",
+    "preview:web": "pnpm --filter @allanwhite/photo-web preview"
+  }
+}

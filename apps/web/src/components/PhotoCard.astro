@@ -1,0 +1,93 @@
+---
+import { formatDate } from '@lib/format'
+import { hasImage, sanityImageUrl } from '@lib/sanityImage'
+import type { Photo } from '@lib/types'
+
+type Props = {
+  photo: Photo
+  priority?: boolean
+}
+
+const { photo, priority = false } = Astro.props
+const href = photo.slug?.current ? `/photos/${photo.slug.current}` : '#'
+const alt = photo.image?.alt || photo.title || 'Untitled photo'
+const imgSrc = hasImage(photo.image)
+  ? sanityImageUrl(photo.image).width(900).height(1100).fit('crop').auto('format').url()
+  : ''
+---
+
+<article class="photo-card">
+  <a href={href} aria-label={photo.title || 'View photo'}>
+    {
+      imgSrc ? (
+        <img src={imgSrc} alt={alt} loading={priority ? 'eager' : 'lazy'} decoding="async" />
+      ) : (
+        <span class="photo-placeholder" aria-hidden="true" />
+      )
+    }
+    <span class="photo-meta">
+      <strong>{photo.title || 'Untitled'}</strong>
+      {photo.takenAt && <small>{formatDate(photo.takenAt)}</small>}
+    </span>
+  </a>
+</article>
+
+<style>
+  .photo-card {
+    position: relative;
+    min-height: 18rem;
+    overflow: hidden;
+    border-radius: 8px;
+    background: var(--bg-soft);
+  }
+
+  .photo-card a {
+    display: block;
+    height: 100%;
+    min-height: inherit;
+    color: var(--ink);
+    text-decoration: none;
+  }
+
+  img,
+  .photo-placeholder {
+    width: 100%;
+    height: 100%;
+    min-height: inherit;
+    object-fit: cover;
+    transition: transform 220ms ease;
+  }
+
+  .photo-placeholder {
+    display: block;
+    background:
+      linear-gradient(135deg, rgba(210, 168, 93, 0.22), transparent 34%),
+      linear-gradient(315deg, rgba(119, 150, 109, 0.26), transparent 40%),
+      #20231f;
+  }
+
+  .photo-card:hover img,
+  .photo-card:hover .photo-placeholder {
+    transform: scale(1.025);
+  }
+
+  .photo-meta {
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    display: grid;
+    gap: 0.2rem;
+    padding: 4rem 1rem 1rem;
+    background: linear-gradient(180deg, transparent, rgba(0, 0, 0, 0.74));
+  }
+
+  strong,
+  small {
+    overflow-wrap: anywhere;
+  }
+
+  small {
+    color: var(--muted);
+  }
+</style>
