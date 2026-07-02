@@ -1,0 +1,161 @@
+# Photo keyword taxonomy
+# Canonical keyword -> list of synonyms (variants seen across catalogs).
+# Empty list = no known synonyms.
+
+people:
+  Allan White: [Allan]
+  Connor White: [Connor]
+  Fiona White: [Fiona]
+  Kristi White: [Kristi]
+  Trinity White: [Trinity]
+  Dr. White: []
+  Glenn Cash: []
+  Patrick Cash: []
+  Phyllis Cash: [Phyllis]
+  Sierra Cash: []
+  Grandma Rose: []
+  Grammy: [grammy] # possibly same person as Grandma Rose — confirm
+  Kira: []
+  Mom: []
+  Cash: [] # bare surname; consider dropping if individuals are always tagged
+
+# Tags originating from upstream apps / import pipelines
+source:
+  Flickr: []
+  From iCloud: []
+  Photo App Picks: [picks]
+  phone-scan: [rescan]
+  Cam A: []
+  Cam B: []
+  shoot 01: []
+  shoot 02: []
+
+# Editing / QA state tags (candidates for deletion)
+workflow:
+  edited: []
+  denoised: []
+  "duplicate?": []
+  red-eye: []
+  HDR tests: [HDR Tests]
+  lens tests: []
+  equipment tests: []
+  the end: []
+  chrome: [] # unclear meaning — confirm
+
+places:
+  Barcelona: []
+  Camp Yamhill: []
+  Cannon Beach: []
+  Cash Mountain: [Cash Mtn, Cash Mtn.]
+  Colorado: []
+  Columbia Gorge: [Gorge]
+  Cumberlands: []
+  Lost Lake: []
+  Mike's House: []
+  Mt. Adams: []
+  Mt. Bachelor: []
+  Mt. Hood: [Mt Hood]
+  Oregon: [OR]
+  PCT: []
+  Portland: []
+  Sagrada Familia: []
+  Smith Rock: []
+  Spain: []
+  Sunriver: []
+  Utah: []
+
+decades:
+  1940s: []
+  1950s: []
+  1960s: []
+  1970s: []
+  1980s: []
+  1990s: []
+  2000s: []
+  2010s: []
+
+seasons:
+  spring: [Spring]
+  summer: [Summer]
+  fall: [Fall, autumn, Autumn]
+  winter: [Winter]
+
+nature:
+  aurora: []
+  beach: []
+  clouds: []
+  deserts: []
+  flora: []
+  flowers: []
+  fog: []
+  garden: []
+  Milky Way: []
+  Moon: []
+  mountains: []
+  nature: []
+  ocean: []
+  pastoral: []
+  snow: []
+  stars: []
+  sunrise: []
+  sunsets: [sunset]
+  trees: []
+  water: []
+  waterfalls: []
+  wildflowers: []
+
+styles: # photographic technique / genre
+  aerial: []
+  astrophotography: []
+  b&w: [B&W]
+  landscapes: [landscape, Landscapes]
+  long exposure: []
+  macro: []
+  still life: []
+  portraits: [portrait, Portraits]
+  headshots: []
+  posed: []
+  formal: [Formal]
+  groups: []
+  avatar: []
+  passport: []
+
+events:
+  baptism: []
+  birthdays: []
+  events: []
+  graduation: []
+  homecoming: []
+  party: []
+  weddings: []
+  Swing Low: [] # production/play? confirm
+
+activities:
+  basketball: []
+  camp: []
+  hikes: [hiking]
+  play: []
+  sports: []
+  travel: [trips, adventures, Adventures] # merged; split back out if distinct
+
+subjects:
+  architecture: [Architecture]
+  babies: [baby]
+  bus: []
+  cathedrals: [Cathedrals]
+  dogs: [dog]
+  family: [Family]
+  food: []
+  friends: [Friends]
+  home: []
+  kids: []
+  outdoors: [Outdoors]
+  people: []
+  siblings: []
+
+school:
+  CCS: []
+  college: []
+  school: []
+  seniors: []
+  teacher: []
