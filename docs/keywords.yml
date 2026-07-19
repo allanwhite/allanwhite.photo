@@ -1,13 +1,19 @@
 # Photo keyword taxonomy
 # Canonical keyword -> list of synonyms (variants seen across catalogs).
 # Empty list = no known synonyms.
+#
+# Reconciled 2026-07-01 against an osxphotos export of the iPhoto/Photos
+# library (iphoto-keywords.json) and new-keywords-found.yml. New entries
+# carry a trailing comment with the photo count seen in that export (e.g.
+# `# 45x`) so low-signal tags are easy to spot later. Entries marked
+# "confirm" are guesses — check them before relying on the category.
 
 people:
   Allan White: [Allan]
   Connor White: [Connor]
   Fiona White: [Fiona]
   Kristi White: [Kristi]
-  Trinity White: [Trinity]
+  Trinity White: [Trinity, trinity]
   Dr. White: []
   Glenn Cash: []
   Patrick Cash: []
@@ -18,6 +24,12 @@ people:
   Kira: []
   Mom: []
   Cash: [] # bare surname; consider dropping if individuals are always tagged
+  Anna: [] # 1x — confirm who this is
+  Isaiah: [] # 1x — confirm who this is
+  Liam: [] # 1x — confirm who this is
+  William: [] # 1x — confirm who this is
+  Ronja Haugholt: [] # 1x — confirm who this is
+  Var Haugholt: [] # 1x — confirm who this is
 
 # Tags originating from upstream apps / import pipelines
 source:
@@ -29,6 +41,10 @@ source:
   Cam B: []
   shoot 01: []
   shoot 02: []
+  Photo Stream: [] # 664x — Apple's old sync feature; consider dropping, not a real subject keyword
+  iPhone: [] # 131x — device-of-origin auto-tag
+  instagram: [] # 2x
+  by Kristi: [] # 1x — photo credit, distinct from the "Kristi White" person tag
 
 # Editing / QA state tags (candidates for deletion)
 workflow:
@@ -41,12 +57,18 @@ workflow:
   equipment tests: []
   the end: []
   chrome: [] # unclear meaning — confirm
+  Lightroom: [LR] # 15x
+  AVIF: [] # 4x
+  Edits: [] # 2x
+  original: [] # 1x
+  backgrounds: [] # 2x
+  equipment: [] # 14x — gear photos, or shorthand for "equipment tests"? confirm
 
 places:
   Barcelona: []
   Camp Yamhill: []
   Cannon Beach: []
-  Cash Mountain: [Cash Mtn, Cash Mtn.]
+  Cash Mountain: [Cash Mtn, Cash Mtn., Cash M]
   Colorado: []
   Columbia Gorge: [Gorge]
   Cumberlands: []
@@ -55,6 +77,8 @@ places:
   Mt. Adams: []
   Mt. Bachelor: []
   Mt. Hood: [Mt Hood]
+  Mt. Rainier: [rainier] # 2x
+  Mt. St. Helens: [St. Helens] # 1x
   Oregon: [OR]
   PCT: []
   Portland: []
@@ -63,6 +87,21 @@ places:
   Spain: []
   Sunriver: []
   Utah: []
+  Lisbon: [] # 210x
+  Montana: [] # 131x
+  Crater Lake NP: [] # 47x
+  Peninsula Park: [] # 23x
+  Salt Lake: [] # 10x
+  Mexico: [] # 4x
+  Oregon Coast: [] # 7x
+  Edgefield: [] # 2x
+  Africa: [] # 8x
+  Burundi: [] # 8x — see Military History / Love Burundi Festival, likely the same trip
+  Forest Park: [forest park] # 1x
+  Woodlawn: [] # 1x — Portland neighborhood? confirm
+  Armory: [] # 1x — the Gerding Theater at the Armory? confirm
+  Good Shepherd: [] # 1x — church/venue? confirm
+  PAM: [] # 1x — Portland Art Museum? confirm
 
 decades:
   1940s: []
@@ -91,7 +130,7 @@ nature:
   garden: []
   Milky Way: []
   Moon: []
-  mountains: []
+  mountains: [Mountains]
   nature: []
   ocean: []
   pastoral: []
@@ -103,6 +142,14 @@ nature:
   water: []
   waterfalls: []
   wildflowers: []
+  forest: [] # 14x
+  smoke: [] # 45x
+  wildfires: [] # 45x
+  weather: [] # 23x
+  rivers: [] # 10x
+  fungi: [] # 7x
+  sky: [skies] # 2x
+  halos: [] # 2x
 
 styles: # photographic technique / genre
   aerial: []
@@ -113,12 +160,18 @@ styles: # photographic technique / genre
   macro: []
   still life: []
   portraits: [portrait, Portraits]
-  headshots: []
+  headshots: [headshot]
   posed: []
   formal: [Formal]
   groups: []
   avatar: []
   passport: []
+  studio: [] # 23x
+  urban: [] # 1x
+  scenics: [] # 5x
+  timelapse: [] # 2x
+  Panorama: [] # 1x
+  selfies: [selfie, self-portrait] # 2x
 
 events:
   baptism: []
@@ -126,24 +179,37 @@ events:
   events: []
   graduation: []
   homecoming: []
-  party: []
+  party: [parties]
   weddings: []
   Swing Low: [] # production/play? confirm
+  Christmas: [] # 1x
+  Easter: [] # 9x
+  holidays: [] # 28x
+  vaccination: [] # 2x
+  Military History: [] # 8x — documentary/heritage project with USAF and Love Burundi Festival? confirm
+  USAF: [] # 8x
+  Love Burundi Festival: [] # 8x
 
 activities:
   basketball: []
   camp: []
   hikes: [hiking]
   play: []
-  sports: []
+  sports: [SPORTS]
   travel: [trips, adventures, Adventures] # merged; split back out if distinct
+  snowshoeing: [] # 29x
+  outings: [] # 41x
+  exploring: [] # 11x
+  road trips: [] # 2x
+  trails: [] # 3x
+  kayaking: [] # 1x
+  volleyball: [] # 1x
+  Climbing: [] # 1x
 
 subjects:
   architecture: [Architecture]
   babies: [baby]
-  bus: []
   cathedrals: [Cathedrals]
-  dogs: [dog]
   family: [Family]
   food: []
   friends: [Friends]
@@ -152,10 +218,84 @@ subjects:
   outdoors: [Outdoors]
   people: []
   siblings: []
+  National Parks: [] # 131x
+  REI: [] # 40x — gear/shopping tag? confirm
+  cities: [] # 17x
+  museums: [] # 2x
+  hotel: [] # 1x
+  library: [] # 1x
+  parks: [] # 1x
+  teens: [] # 10x
+  toys: [] # 7x
+  bridge: [] # 1x
+  trestle: [] # 8x
+  crowds: [] # 1x
+  cyclists: [] # 1x
+  backyard: [] # 3x
+  beards: [] # 1x
+  smiling: [] # 1x
+
+# New category: named pets and animal subjects (dogs moved here from subjects)
+animals:
+  dogs: [dog]
+  cats: [] # 6x
+  kittens: [] # 6x
+  pets: [] # 2x
+  Birdie: [birdie] # 6x — pet's name? confirm
+
+# New category: vehicles (bus moved here from subjects)
+vehicles:
+  bus: []
+  cars: [] # 3x
+  Bronco: [] # 3x
+  Ford Flex: [] # 2x
+  airplanes: [aircraft] # 3x
+
+# New category: creative hobbies, distinct from photography itself
+hobbies:
+  writing: [] # 8x
+  podcasting: [] # 9x
+  art: [artwork] # 7x
+  painting: [paintings] # 2x
+  music: [] # 1x
+  piano: [] # 1x
+  crafts: [] # 1x
+  coffee: [] # 1x
+  artist: [] # 1x
+  books: [] # 6x
+  posters: [] # 1x
+
+# New category: screenshots / day-job tags that likely don't belong on a
+# photography site — review before deciding to keep, exclude, or delete.
+work:
+  Contentful: [] # 281x
+  UX Team: [] # 4x
+  healthsparq: [hsq] # 7x
+  healthcare: [] # 1x
+  office: [] # 15x
+  work: [] # 250x
+  documents: [] # 3x
+  questions: [] # 3x
+  zoom: [] # 1x
+  text: [] # 1x
+
+# New category: low-confidence / low-value tags surfaced by the iPhoto
+# export. Confirm, recategorize, or delete each one.
+review:
+  s: [] # 0x — looks like a stray tag, candidate for deletion
+  20th Century Studios: [] # 1x — movie screenshot?
+  The King’s Man: [] # 1x — movie screenshot? (apostrophe matches Photos' literal keyword string)
+  Rhys Ifans: [] # 1x — actor name, likely from the same movie screenshot
+  life: [] # 1x
+  Sunday: [] # 1x
+  personal: [] # 10x — opposite of "work"?
+  7-8 Boys: [] # 1x — team/class name? confirm
+  PUMP: [] # 1x
+  For sale: [] # 2x — marketplace listing photos? confirm
 
 school:
   CCS: []
   college: []
   school: []
-  seniors: []
+  seniors: [senior]
   teacher: []
