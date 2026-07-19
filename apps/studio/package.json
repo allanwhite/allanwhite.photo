@@ -10,7 +10,7 @@
   "dependencies": {
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
-    "sanity": "^6.3.0",
+    "sanity": "^6.5.0",
     "sanity-plugin-cloudinary": "^2.0.4",
     "styled-components": "^6.4.3"
   },
