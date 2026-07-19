@@ -1,5 +1,19 @@
 import groq from 'groq'
 
+export const imageProjection = groq`{
+  alt,
+  hotspot,
+  crop,
+  asset->{
+    _id,
+    url,
+    metadata {
+      dimensions,
+      lqip
+    }
+  }
+}`
+
 export const siteSettingsQuery = groq`
   *[_type == "siteSettings"][0] {
     siteName,
@@ -8,16 +22,16 @@ export const siteSettingsQuery = groq`
     socialLinks,
     featuredGallery->{
       _id, title, slug,
-      coverPhoto->{ title, slug, image }
+      coverPhoto->{ title, slug, image ${imageProjection} }
     },
-    defaultSeoImage->{ title, slug, image }
+    defaultSeoImage->{ title, slug, image ${imageProjection} }
   }
 `
 
 export const latestPhotosQuery = groq`
   *[_type == "photo"]
   | order(takenAt desc) [0...12] {
-    _id, title, slug, takenAt, image,
+    _id, title, slug, takenAt, image ${imageProjection},
     tags[]->{ name, slug, category }
   }
 `
@@ -29,7 +43,7 @@ export const allPhotoSlugsQuery = groq`
 export const photoBySlugQuery = groq`
   *[_type == "photo" && slug.current == $slug][0] {
     _id, title, slug, captionBody, takenAt,
-    image, exif, gps, companion,
+    image ${imageProjection}, exif, gps, companion,
     gear[]->{ _id, name, slug, type },
     tags[]->{ _id, name, slug, category }
   }
@@ -42,10 +56,10 @@ export const allGallerySlugsQuery = groq`
 export const galleryBySlugQuery = groq`
   *[_type == "gallery" && slug.current == $slug][0] {
     _id, title, slug, description, location,
-    coverPhoto->{ _id, title, slug, image },
+    coverPhoto->{ _id, title, slug, image ${imageProjection} },
     photos[] {
       captionOverride,
-      photo->{ _id, title, slug, image, exif, takenAt }
+      photo->{ _id, title, slug, image ${imageProjection}, exif, takenAt }
     },
     tags[]->{ _id, name, slug, category }
   }
@@ -55,7 +69,11 @@ export const latestPostsQuery = groq`
   *[_type == "post"]
   | order(publishedAt desc) [0...12] {
     _id, title, slug, publishedAt, excerpt,
-    featuredGallery->{ title, slug, coverPhoto->{ title, slug, image } },
+    featuredGallery->{
+      title,
+      slug,
+      coverPhoto->{ title, slug, image ${imageProjection} }
+    },
     tags[]->{ name, slug, category }
   }
 `
@@ -69,10 +87,10 @@ export const postBySlugQuery = groq`
     _id, title, slug, publishedAt, excerpt, body,
     featuredGallery->{
       _id, title, slug, description,
-      coverPhoto->{ _id, title, slug, image },
+      coverPhoto->{ _id, title, slug, image ${imageProjection} },
       photos[] {
         captionOverride,
-        photo->{ _id, title, slug, image, exif, takenAt }
+        photo->{ _id, title, slug, image ${imageProjection}, exif, takenAt }
       }
     },
     tags[]->{ _id, name, slug, category },
@@ -85,7 +103,7 @@ export const gearListQuery = groq`
   | order(manufacturer asc, name asc) [0...48] {
     _id, name, slug, manufacturer, type, rating,
     hasAffiliateLinks,
-    heroImage->{ _id, title, slug, image }
+    heroImage->{ _id, title, slug, image ${imageProjection} }
   }
 `
 
@@ -97,14 +115,14 @@ export const gearBySlugQuery = groq`
   *[_type == "gear" && slug.current == $slug][0] {
     _id, name, slug, manufacturer, type, specs, myReview,
     rating, hasAffiliateLinks, affiliateUrl, purchaseUrl,
-    heroImage->{ _id, title, slug, image }
+    heroImage->{ _id, title, slug, image ${imageProjection} }
   }
 `
 
 export const photosByGearQuery = groq`
   *[_type == "photo" && references($gearId)]
   | order(takenAt desc) [0...24] {
-    _id, title, slug, image, takenAt
+    _id, title, slug, image ${imageProjection}, takenAt
   }
 `
 
@@ -114,14 +132,19 @@ export const tagBySlugQuery = groq`
   }
 `
 
-export const photosByTagQuery = groq`
-  *[_type == "photo" && $tagSlug in tags[]->slug.current]
-  | order(takenAt desc)
-  [$offset...$offset + $limit] {
-    _id, title, slug, image, takenAt,
-    tags[]->{ name, slug, category }
-  }
-`
+export function buildPhotosByTagQuery(offset: number, limit: number): string {
+  const start = Math.max(Math.trunc(offset), 0)
+  const count = Math.min(Math.max(Math.trunc(limit), 1), 100)
+
+  return groq`
+    *[_type == "photo" && $tagSlug in tags[]->slug.current]
+    | order(takenAt desc)
+    [${start}...${start + count}] {
+      _id, title, slug, image ${imageProjection}, takenAt,
+      tags[]->{ name, slug, category }
+    }
+  `
+}
 
 type SearchParams = {
   q?: string
@@ -167,7 +190,7 @@ export function buildSearchQuery(params: SearchParams): string {
     | score(${params.q ? `boost(title match ${JSON.stringify(`${params.q}*`)}, 3)` : '1'})
     | ${order}
     [${params.offset}...${params.offset + 24}] {
-      _type, _id, title, slug, image, excerpt,
+      _type, _id, title, slug, image ${imageProjection}, excerpt,
       "takenAt": coalesce(takenAt, publishedAt)
     }
   `

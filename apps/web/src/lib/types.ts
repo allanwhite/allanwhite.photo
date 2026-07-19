@@ -12,6 +12,7 @@ export type SanityImage = {
         width?: number
         height?: number
       }
+      lqip?: string
     }
   }
   alt?: string

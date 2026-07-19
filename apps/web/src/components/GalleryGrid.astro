@@ -8,19 +8,18 @@ type Props = {
 }
 
 const { photos } = Astro.props
-const galleryId = `gallery-${Math.random().toString(36).slice(2)}`
 ---
 
 {
   photos.length ? (
-    <div class="gallery-grid" id={galleryId}>
+    <div class="gallery-grid">
       {photos.map((photo) => {
         const dimensions = imageDimensions(photo.image)
         const fullSrc = hasImage(photo.image)
-          ? sanityImageUrl(photo.image).width(2400).auto('format').url()
+          ? sanityImageUrl(photo.image).ignoreImageParams().width(2400).auto('format').url()
           : ''
         const thumbSrc = hasImage(photo.image)
-          ? sanityImageUrl(photo.image).width(700).height(700).fit('crop').auto('format').url()
+          ? sanityImageUrl(photo.image).ignoreImageParams().width(700).auto('format').url()
           : ''
         const alt = photo.image?.alt || photo.title || 'Photo'
 
@@ -31,7 +30,18 @@ const galleryId = `gallery-${Math.random().toString(36).slice(2)}`
             data-pswp-height={dimensions.height}
             aria-label={photo.title || 'Open photo'}
           >
-            {thumbSrc ? <img src={thumbSrc} alt={alt} loading="lazy" decoding="async" /> : <span />}
+            {thumbSrc ? (
+              <img
+                src={thumbSrc}
+                alt={alt}
+                width={dimensions.width}
+                height={dimensions.height}
+                loading="lazy"
+                decoding="async"
+              />
+            ) : (
+              <span />
+            )}
           </a>
         )
       })}
@@ -43,20 +53,18 @@ const galleryId = `gallery-${Math.random().toString(36).slice(2)}`
   )
 }
 
-<script define:vars={{ galleryId }}>
+<script>
   import PhotoSwipeLightbox from 'photoswipe/lightbox'
 
-  const element = document.getElementById(galleryId)
-
-  if (element) {
+  document.querySelectorAll('.gallery-grid').forEach((gallery) => {
     const lightbox = new PhotoSwipeLightbox({
-      gallery: `#${galleryId}`,
+      gallery,
       children: 'a',
       pswpModule: () => import('photoswipe'),
     })
 
     lightbox.init()
-  }
+  })
 </script>
 
 <style>
@@ -68,21 +76,20 @@ const galleryId = `gallery-${Math.random().toString(36).slice(2)}`
 
   a {
     display: block;
-    aspect-ratio: 1;
-    overflow: hidden;
     border-radius: 4px;
     background: var(--bg-soft);
   }
 
-  img,
-  span {
+  img {
+    display: block;
     width: 100%;
-    height: 100%;
-    object-fit: cover;
+    height: auto;
+    border-radius: inherit;
   }
 
   span {
     display: block;
+    aspect-ratio: 4 / 3;
     background: #20231f;
   }
 </style>

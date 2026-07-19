@@ -1,7 +1,7 @@
 ---
 import PhotoCard from '@components/PhotoCard.astro'
 import BaseLayout from '@layouts/BaseLayout.astro'
-import { photosByTagQuery, siteSettingsQuery, tagBySlugQuery } from '@lib/queries'
+import { buildPhotosByTagQuery, siteSettingsQuery, tagBySlugQuery } from '@lib/queries'
 import { fetchSanity } from '@lib/sanity'
 import type { Photo, SiteSettings, Tag } from '@lib/types'
 
@@ -14,7 +14,7 @@ const offset = (page - 1) * 24
 const [settings, tag, photos] = await Promise.all([
   fetchSanity<SiteSettings | null>(siteSettingsQuery, {}, null),
   fetchSanity<Tag | null>(tagBySlugQuery, { slug }, null),
-  fetchSanity<Photo[]>(photosByTagQuery, { tagSlug: slug, offset, limit: 24 }, []),
+  fetchSanity<Photo[]>(buildPhotosByTagQuery(offset, 24), { tagSlug: slug }, []),
 ])
 ---
 
