@@ -1,6 +1,6 @@
 # Photography Platform — Project Plan
 
-**Version 2.2 · July 2026 · R. Allan White**
+**Version 2.3 · July 2026 · R. Allan White**
 
 A personal photography publishing platform for HDR images, video clips, gear reviews, and editorial content. This revision re-scopes the build around a lean, low-cost **Phase 1 launch** — Sanity, Astro, and Cloudflare only — with HDR, map adventures, and the ingest CLI carried forward as clearly-scoped **Phase 2 / future initiatives** rather than blocking the initial launch.
 
@@ -24,6 +24,8 @@ v1.1 assumed Cloudinary as the asset source of truth for both photos and video, 
 **v2.1 correction note.** The lean v2.0 scope still stands, but scaffold planning surfaced several implementation corrections: Astro 7 sets the project Node floor at `>=22.12.0`; Cloudflare Workers replaces the old Pages target for Astro SSR; Workers Builds + `wrangler.jsonc` become the deploy setup; `REVALIDATE_SECRET` is now part of the webhook contract; search is confirmed for Phase 1; alt text is manual with Studio validation warnings; and the affiliate disclosure fields are now included in the schema.
 
 **v2.2 environment note.** Cloudflare and Cloudinary key placement now has a short companion note in [`docs/stack-notes.md`](stack-notes.md). Keep this plan focused on architecture; use the stack note for `.env.local`, Cloudflare deploy variables, and Cloudinary delivery/upload secrets.
+
+**v2.3 image-ratio note.** Published photographs must keep their original aspect ratios. The current scaffold still crops images in `PhotoCard`, `GalleryGrid`, the home hero, the gear hero, and the photo-page video poster. Treat this as known design debt, not the intended architecture. Fix each call site during the relevant component or design pass rather than making it a separate launch blocker.
 
 The result is a Phase 1 scope that launches on entirely free-tier infrastructure except for Cloudinary's video transcoding, with clear, non-blocking paths back to HDR, mapping, and automation once the core site is live and content is flowing.
 
@@ -751,12 +753,14 @@ Usage is chainable per call site rather than named presets (Sanity has no server
 
 ```astro
 <img
-  src={sanityImageUrl(photo.image).width(400).height(400).fit('crop').auto('format').url()}
+  src={sanityImageUrl(photo.image).width(400).auto('format').url()}
   alt={photo.image.alt}
 />
 ```
 
 `auto('format')` negotiates WebP/AVIF automatically per browser — no manual format branching needed.
+
+Photo delivery may resize and reformat an image, but it must not crop it. Use intrinsic dimensions from Sanity metadata and let rendered height follow the source aspect ratio. Do not use `fit('crop')`, a forced container aspect ratio, or `object-fit: cover` for published photography. Open Graph cards and other fixed-size compositions should contain the complete photograph within their frame instead of cropping it.
 
 > **On Cloudflare's own image products.** Cloudflare Image Resizing and the merged Cloudflare Images product both require a **paid Pro plan ($20/mo) or higher** to transform images from an external source (Sanity, in this case) — see Appendix A. Deliberately not used. Sanity's free-tier image CDN is the only transform layer in Phase 1.
 
@@ -832,7 +836,7 @@ const { photos } = Astro.props as { photos: Photo[] }
       data-pswp-height={photo.image.asset.metadata.dimensions.height}
     >
       <img
-        src={sanityImageUrl(photo.image).width(400).height(400).fit('crop').auto('format').url()}
+        src={sanityImageUrl(photo.image).width(400).auto('format').url()}
         alt={photo.image.alt ?? photo.title}
         loading="lazy"
         decoding="async"
@@ -859,8 +863,8 @@ const { photos } = Astro.props as { photos: Photo[] }
     grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
     gap: 4px;
   }
-  .gallery-grid a { display: block; aspect-ratio: 1; overflow: hidden; }
-  .gallery-grid img { width: 100%; height: 100%; object-fit: cover; }
+  .gallery-grid a { display: block; overflow: hidden; }
+  .gallery-grid img { display: block; width: 100%; height: auto; }
 </style>
 ```
 
@@ -1177,3 +1181,4 @@ A deliberate list of what's available but **not** turned on, and why:
 | **2.0** | **June 2026** | **Lean launch pivot.** Photos moved to native Sanity images; Cloudinary scoped to video only; HDR, Map Adventures, and the ingest CLI all deferred to Phase 2/future; Astro 6→7; route caching adopted; Cloudflare's paid image products explicitly evaluated and rejected. |
 | **2.1** | **July 2026** | **Scaffold correction pass.** Cloudflare Workers replaces the old Pages target; Node floor moves to `>=22.12.0`; Workers Builds + `wrangler.jsonc` become the deploy setup; `REVALIDATE_SECRET` is added; affiliate disclosure fields are added; search is confirmed for Phase 1; alt text is manual with Studio warnings. |
 | **2.2** | **July 2026** | **Environment note pass.** Added [`docs/stack-notes.md`](stack-notes.md) as the source of truth for Cloudflare and Cloudinary env placement, including `.env.local`, CI secrets, Workers settings, and the split between public delivery values and private upload/deploy secrets. |
+| **2.3** | **July 2026** | **Image-ratio decision.** Published photographs must keep their original aspect ratios. Existing crop transforms and cover-style layouts are tracked as design debt to remove during component redesign. |
