@@ -30,18 +30,13 @@ export const gear = defineType({
     defineField({
       name: 'specs',
       type: 'array',
-      of: [defineArrayMember({ type: 'block' })],
+      of: [defineArrayMember({ type: 'block' }), defineArrayMember({ type: 'table' })],
     }),
     defineField({
       name: 'myReview',
       title: 'My review',
-      type: 'array',
-      of: [defineArrayMember({ type: 'block' })],
-    }),
-    defineField({
-      name: 'rating',
-      type: 'number',
-      validation: (rule) => rule.min(1).max(10),
+      type: 'reference',
+      to: [{ type: 'post' }],
     }),
     defineField({
       name: 'hasAffiliateLinks',
@@ -50,7 +45,11 @@ export const gear = defineType({
       initialValue: false,
     }),
     defineField({ name: 'affiliateUrl', title: 'Affiliate URL', type: 'url' }),
-    defineField({ name: 'purchaseUrl', title: 'Purchase URL', type: 'url' }),
+    defineField({
+      name: 'tags',
+      type: 'array',
+      of: [defineArrayMember({ type: 'reference', to: [{ type: 'tag' }] })],
+    }),
     defineField({
       name: 'heroImage',
       title: 'Hero image',

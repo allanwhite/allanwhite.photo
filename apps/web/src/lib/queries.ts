@@ -98,6 +98,12 @@ export const postBySlugQuery = groq`
   }
 `
 
+export const pageBySlugQuery = groq`
+  *[_type == "page" && slug.current == $slug][0] {
+    _id, _type, title, slug, seoDescription, body
+  }
+`
+
 export const gearListQuery = groq`
   *[_type == "gear"]
   | order(manufacturer asc, name asc) [0...48] {

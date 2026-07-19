@@ -1,33 +1,29 @@
 ---
 import GalleryGrid from '@components/GalleryGrid.astro'
 import BaseLayout from '@layouts/BaseLayout.astro'
+import { getDraftModeProps } from '@lib/draftMode'
 import { renderPortableText } from '@lib/portableText'
 import {
-  allGearSlugsQuery,
   gearBySlugQuery,
   photosByGearQuery,
   siteSettingsQuery,
 } from '@lib/queries'
-import { fetchSanity, hasSanityConfig } from '@lib/sanity'
+import { fetchSanity } from '@lib/sanity'
 import { hasImage, sanityImageUrl } from '@lib/sanityImage'
 import type { Gear, Photo, SiteSettings } from '@lib/types'
 
-export async function getStaticPaths() {
-  if (!hasSanityConfig) return []
-
-  const slugs = await fetchSanity<{ slug: string }[]>(allGearSlugsQuery, {}, [])
-  return slugs.map(({ slug }) => ({ params: { slug } }))
-}
+export const prerender = false
 
 const { slug } = Astro.params
+const draftMode = getDraftModeProps(Astro.cookies)
 const [settings, gear] = await Promise.all([
-  fetchSanity<SiteSettings | null>(siteSettingsQuery, {}, null),
-  fetchSanity<Gear | null>(gearBySlugQuery, { slug }, null),
+  fetchSanity<SiteSettings | null>(siteSettingsQuery, {}, null, draftMode),
+  fetchSanity<Gear | null>(gearBySlugQuery, { slug }, null, draftMode),
 ])
 
 if (!gear) return Astro.redirect('/404')
 
-const photos = await fetchSanity<Photo[]>(photosByGearQuery, { gearId: gear._id }, [])
+const photos = await fetchSanity<Photo[]>(photosByGearQuery, { gearId: gear._id }, [], draftMode)
 const specsHtml = renderPortableText(gear.specs)
 const reviewHtml = renderPortableText(gear.myReview)
 const heroSrc = hasImage(gear.heroImage?.image)

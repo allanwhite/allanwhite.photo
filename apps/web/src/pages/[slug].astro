@@ -1,0 +1,37 @@
+---
+import BaseLayout from '@layouts/BaseLayout.astro'
+import { getDraftModeProps } from '@lib/draftMode'
+import { renderPortableText } from '@lib/portableText'
+import { pageBySlugQuery, siteSettingsQuery } from '@lib/queries'
+import { fetchSanity } from '@lib/sanity'
+import type { Page, SiteSettings } from '@lib/types'
+
+export const prerender = false
+
+const { slug } = Astro.params
+const draftMode = getDraftModeProps(Astro.cookies)
+const [settings, page] = await Promise.all([
+  fetchSanity<SiteSettings | null>(siteSettingsQuery, {}, null, draftMode),
+  fetchSanity<Page | null>(pageBySlugQuery, { slug }, null, draftMode),
+])
+
+if (!page) return Astro.redirect('/404')
+
+const bodyHtml = renderPortableText(page.body)
+---
+
+<BaseLayout title={page.title} description={page.seoDescription} settings={settings}>
+  <article class="section-narrow">
+    <header>
+      <p class="eyebrow">Page</p>
+      <h1>{page.title || 'Untitled page'}</h1>
+    </header>
+    {
+      bodyHtml ? (
+        <div class="rich-text" set:html={bodyHtml} />
+      ) : (
+        <div class="empty"><p>No body content yet.</p></div>
+      )
+    }
+  </article>
+</BaseLayout>

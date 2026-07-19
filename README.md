@@ -15,10 +15,9 @@ From the repository root:
 ```sh
 pnpm install
 cp .env.example .env.local
-cp .env.example apps/web/.env.local
 ```
 
-The root `.env.local` is read by Sanity Studio. Astro reads `apps/web/.env.local`. Add the same Sanity project and dataset values to both files.
+The root `.env.local` is read by both Sanity Studio and Astro.
 
 The main local values are:
 
@@ -26,11 +25,14 @@ The main local values are:
 PUBLIC_SANITY_PROJECT_ID=
 PUBLIC_SANITY_DATASET=production
 PUBLIC_SANITY_API_VERSION=2026-07-01
+PUBLIC_SANITY_STUDIO_URL=http://localhost:3333
+SANITY_API_READ_TOKEN=
+SANITY_STUDIO_PREVIEW_URL=http://localhost:4321
 PUBLIC_CLOUDINARY_CLOUD_NAME=
 REVALIDATE_SECRET=
 ```
 
-The Cloudinary cloud name is only needed for video delivery. Keep `REVALIDATE_SECRET` private. See [docs/stack-notes.md](docs/stack-notes.md) for the full environment variable notes.
+The Sanity read token enables draft content in Preview and must have Viewer access. The Cloudinary cloud name is only needed for video delivery. Keep `SANITY_API_READ_TOKEN` and `REVALIDATE_SECRET` private. See [docs/stack-notes.md](docs/stack-notes.md) for the full environment variable notes.
 
 ## Run locally
 

@@ -8,13 +8,17 @@
     "deploy": "node scripts/run-sanity.mjs deploy"
   },
   "dependencies": {
+    "@sanity/table": "^3.1.10",
+    "@sanity/vision": "^6.5.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "sanity": "^6.5.0",
     "sanity-plugin-cloudinary": "^2.0.14",
+    "sanity-plugin-media": "^6.0.3",
     "styled-components": "^6.4.3"
   },
   "devDependencies": {
+    "@types/node": "^26.1.1",
     "typescript": "^5.9.3"
   },
   "engines": {

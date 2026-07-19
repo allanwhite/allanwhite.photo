@@ -101,6 +101,14 @@ export type Post = {
   gear?: Gear[]
 }
 
+export type Page = {
+  _id?: string
+  title?: string
+  slug?: Slug
+  seoDescription?: string
+  body?: unknown[]
+}
+
 export type SiteSettings = {
   siteName?: string
   tagline?: string

@@ -1,4 +1,5 @@
 import cloudflare from '@astrojs/cloudflare'
+import react from '@astrojs/react'
 import { defineConfig, memoryCache, sessionDrivers } from 'astro/config'
 
 export default defineConfig({
@@ -6,6 +7,7 @@ export default defineConfig({
     imageService: 'passthrough',
     inspectorPort: false,
   }),
+  integrations: [react()],
   session: {
     driver: sessionDrivers.lruCache(),
   },
@@ -15,5 +17,8 @@ export default defineConfig({
   routeRules: {
     '/tags/[slug]': { maxAge: 300, swr: 60 },
     '/search': { maxAge: 60, swr: 30 },
+  },
+  vite: {
+    envDir: '../..',
   },
 })

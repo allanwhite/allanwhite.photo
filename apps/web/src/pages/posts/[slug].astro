@@ -2,23 +2,20 @@
 import GalleryGrid from '@components/GalleryGrid.astro'
 import TagList from '@components/TagList.astro'
 import BaseLayout from '@layouts/BaseLayout.astro'
+import { getDraftModeProps } from '@lib/draftMode'
 import { formatDate } from '@lib/format'
 import { renderPortableText } from '@lib/portableText'
-import { allPostSlugsQuery, postBySlugQuery, siteSettingsQuery } from '@lib/queries'
-import { fetchSanity, hasSanityConfig } from '@lib/sanity'
+import { postBySlugQuery, siteSettingsQuery } from '@lib/queries'
+import { fetchSanity } from '@lib/sanity'
 import type { Photo, Post, SiteSettings } from '@lib/types'
 
-export async function getStaticPaths() {
-  if (!hasSanityConfig) return []
-
-  const slugs = await fetchSanity<{ slug: string }[]>(allPostSlugsQuery, {}, [])
-  return slugs.map(({ slug }) => ({ params: { slug } }))
-}
+export const prerender = false
 
 const { slug } = Astro.params
+const draftMode = getDraftModeProps(Astro.cookies)
 const [settings, post] = await Promise.all([
-  fetchSanity<SiteSettings | null>(siteSettingsQuery, {}, null),
-  fetchSanity<Post | null>(postBySlugQuery, { slug }, null),
+  fetchSanity<SiteSettings | null>(siteSettingsQuery, {}, null, draftMode),
+  fetchSanity<Post | null>(postBySlugQuery, { slug }, null, draftMode),
 ])
 
 if (!post) return Astro.redirect('/404')

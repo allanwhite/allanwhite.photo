@@ -1,4 +1,8 @@
 ---
+import { perspectiveCookieName } from '@sanity/preview-url-secret/constants'
+import { stegaClean } from '@sanity/client/stega'
+import DisableDraftMode from '@components/DisableDraftMode'
+import SanityVisualEditing from '@components/SanityVisualEditing'
 import type { SiteSettings } from '@lib/types'
 
 type Props = {
@@ -13,8 +17,11 @@ const {
   settings,
 } = Astro.props
 
-const siteName = settings?.siteName || 'R. Allan White'
-const pageTitle = title ? `${title} | ${siteName}` : `${siteName} Photography`
+const siteName = stegaClean(settings?.siteName) || 'R. Allan White'
+const cleanTitle = stegaClean(title)
+const cleanDescription = stegaClean(description)
+const pageTitle = cleanTitle ? `${cleanTitle} | ${siteName}` : `${siteName} Photography`
+const draftMode = Astro.cookies.has(perspectiveCookieName)
 ---
 
 <!doctype html>
@@ -22,7 +29,7 @@ const pageTitle = title ? `${title} | ${siteName}` : `${siteName} Photography`
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="description" content={description} />
+    <meta name="description" content={cleanDescription} />
     <title>{pageTitle}</title>
   </head>
   <body>
@@ -50,6 +57,14 @@ const pageTitle = title ? `${title} | ${siteName}` : `${siteName} Photography`
         {settings?.socialLinks?.mastodon && <a href={settings.socialLinks.mastodon}>Mastodon</a>}
       </div>
     </footer>
+    {
+      draftMode && (
+        <>
+          <SanityVisualEditing client:only="react" />
+          <DisableDraftMode client:only="react" />
+        </>
+      )
+    }
   </body>
 </html>
 
